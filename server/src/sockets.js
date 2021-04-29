@@ -8,7 +8,7 @@ const {
 module.exports = (server) => {
   const io = socketIO(server, {
 		cors: {
-			origin: ['http://localhost:5000', 'https://buzzer.pointofoblivion.ca'],
+			origin: ['http://localhost:5000', 'http://buzzer.pointofoblivion.ca'],
 			methods: ["GET", "POST"]
 		}
 	});

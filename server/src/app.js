@@ -14,7 +14,7 @@ app.use(helmet());
 
 // Add a list of allowed origins.
 // If you have more origins you would like to add, you can add them to the array below.
-const allowedOrigins = ['http://localhost:5000', 'https://buzzer.pointofoblivion.ca'];
+const allowedOrigins = ['http://localhost:5000', 'http://buzzer.pointofoblivion.ca'];
 
 const options = {
   origin: allowedOrigins

@@ -122,70 +122,72 @@
 	$: hostDisabled = $state.host !== undefined;
 </script>
 
-<main class="text-white max-w-7xl mx-auto bg-gray-900 min-h-screen">
-	<!-- banner -->
-	<div class="bg-gray-800 py-3 px-3 sm:px-6 lg:px-8 flex items-center border-gray-500 border-2 rounded">
-		<div class="flex-1 text-center">
-			<h1 class="text-4xl sm:text-6xl md:text-8xl uppercase">Jeopardy!</h1>
-		</div>
-	</div>
-	<section id="content" class="px-3">
-		{#if connected}
-			<!-- Connection status header -->
-			<div class="my-1 flex content-start space-between">
-				<div id="connectionInfo" class="flex-1">
-					<svg height="32" width="32">
-						<circle cx="16" cy="16" r="8" fill="green" />
-						<title>Connected. ({latency}ms latency)</title>
-					</svg>
-				</div>
-				<div id="game-status" class="flex-1 text-center">
-					<span class="font-semibold text-base">Game status:</span>
-					{#if $state.gameStarted }
-						Started
-					{:else}
-						In the waiting room
-					{/if}
-				</div>
+<main class="bg-black">
+	<div class="text-white max-w-7xl mx-auto bg-gray-900 min-h-screen">
+		<!-- banner -->
+		<div class="bg-gray-800 py-3 px-3 sm:px-6 lg:px-8 flex items-center border-gray-500 border-2 rounded">
+			<div class="flex-1 text-center">
+				<h1 class="text-4xl sm:text-6xl md:text-8xl uppercase">Jeopardy!</h1>
 			</div>
-
-			{#if !joined}
-				<div id="introContainer" class="py-3 md:py-6 bg-gray-700">
-					<form class="flex flex-col content-center justify-center">
-						<div class="flex-1 self-center w-1/2">
-							<label for="nameInput">Your name: </label>
-							<input class="input w-full text-lg" type="text" id="nameInput" autocomplete="off" bind:value={name} />
-						</div>
-						<div class="flex-1 my-3 flex justify-between self-center w-1/2">
-							<button class="flex-1 btn btn-purple mx-2" type="button" disabled="{hostDisabled}" on:click="{() => joinAsHost()}">Join As Host</button>
-							<button class="flex-1 btn btn-purple mx-2" type="button" on:click="{() => joinAsPlayer()}">Join As Player</button>
-						</div>
-					</form>
+		</div>
+		<section id="content" class="px-3">
+			{#if connected}
+				<!-- Connection status header -->
+				<div class="my-1 flex content-start space-between">
+					<div id="connectionInfo" class="flex-1">
+						<svg height="32" width="32">
+							<circle cx="16" cy="16" r="8" fill="green" />
+							<title>Connected. ({latency}ms latency)</title>
+						</svg>
+					</div>
+					<div id="game-status" class="flex-1 text-center">
+						<span class="font-semibold text-base">Game status:</span>
+						{#if $state.gameStarted }
+							Started
+						{:else}
+							In the waiting room
+						{/if}
+					</div>
 				</div>
-			{/if}
 
-			{#if joined}
-				{#if isHost()}
-					<!-- HOST PANEL -->
-					<p class="my-2">You are the host</p>
-					<HostControls {socket}></HostControls>
-				{:else}
-					<p class="my-2">Hosted by {getHostName()}</p>
-					<!-- PLAYER PANEL - Hide the buzzer until the game starts-->
-					{#if $state.gameStarted }
-						<div id="buzzerContainer" class="my-4 w-full bg-gray-700 text-center">
-							<!-- buzzer at the top of the screen -->
-							<Buzzer {socket}></Buzzer>
-						</div>
-					{/if}
+				{#if !joined}
+					<div id="introContainer" class="py-3 md:py-6 bg-gray-700">
+						<form class="flex flex-col content-center justify-center">
+							<div class="flex-1 self-center w-1/2">
+								<label for="nameInput">Your name: </label>
+								<input class="input w-full text-lg" type="text" id="nameInput" autocomplete="off" bind:value={name} />
+							</div>
+							<div class="flex-1 my-3 flex justify-between self-center w-1/2">
+								<button class="flex-1 btn btn-purple mx-2" type="button" disabled="{hostDisabled}" on:click="{() => joinAsHost()}">Join As Host</button>
+								<button class="flex-1 btn btn-purple mx-2" type="button" on:click="{() => joinAsPlayer()}">Join As Player</button>
+							</div>
+						</form>
+					</div>
 				{/if}
 
-				<TeamDetails {socket} {playersById} {teamsByName}></TeamDetails>
+				{#if joined}
+					{#if isHost()}
+						<!-- HOST PANEL -->
+						<p class="my-2">You are the host</p>
+						<HostControls {socket}></HostControls>
+					{:else}
+						<p class="my-2">Hosted by {getHostName()}</p>
+						<!-- PLAYER PANEL - Hide the buzzer until the game starts-->
+						{#if $state.gameStarted }
+							<div id="buzzerContainer" class="my-4 w-full bg-gray-700 text-center">
+								<!-- buzzer at the top of the screen -->
+								<Buzzer {socket}></Buzzer>
+							</div>
+						{/if}
+					{/if}
+
+					<TeamDetails {socket} {playersById} {teamsByName}></TeamDetails>
+				{/if}
+			{:else}
+				<p class="mt-2">Not connected to server. Waiting to connect</p>
 			{/if}
-		{:else}
-			<p class="mt-2">Not connected to server. Waiting to connect</p>
-		{/if}
-	</section>
+		</section>
+	</div>
 </main>
 
 <style global lang="postcss">
