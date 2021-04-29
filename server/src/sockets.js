@@ -86,11 +86,16 @@ module.exports = (server) => {
 
 		function setTeam(team) {
 			// can't switch teams once the game is started, unless they don't have one
-			if (!state.gameStarted || state.playerInfo[socket.id].team === undefined) {
+			const playerInfo = state.playerInfo[socket.id];
+			if (!playerInfo) {
+				return;
+			}
+
+			if (!state.gameStarted || playerInfo.team === undefined) {
 				// verify that the team exists
 				if (state.teamInfo[team]) {
 					// If they are currently in a team, remove them from it.
-					const currentTeam = state.playerInfo[socket.id].team;
+					const currentTeam = playerInfo.team;
 					if (state.teamInfo[currentTeam]) {
 						const index = state.teamInfo[currentTeam].players.indexOf(socket.id);
 						if (index > -1) {
