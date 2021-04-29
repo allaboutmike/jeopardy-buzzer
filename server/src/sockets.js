@@ -1,9 +1,7 @@
-const { SSL_OP_NO_TICKET } = require('constants');
 const crypto = require('crypto');
 const socketIO = require('socket.io');
 
 const {
-  MAX_ERROR_COUNT = 20,
   IP_SALT,
 } = process.env;
 
@@ -87,8 +85,8 @@ module.exports = (server) => {
 		}
 
 		function setTeam(team) {
-			// can't switch teams once the game is started
-			if (!state.gameStarted) {
+			// can't switch teams once the game is started, unless they don't have one
+			if (!state.gameStarted || state.playerInfo[socket.id].team === undefined) {
 				// verify that the team exists
 				if (state.teamInfo[team]) {
 					// If they are currently in a team, remove them from it.
@@ -187,16 +185,7 @@ module.exports = (server) => {
 			}
 		}
 
-		socket.on('start-game', startGame);
-		socket.on('end-game', endGame);
-		socket.on('next-round', nextRound);
-		socket.on('activate-buzzers', activateBuzzers);
-
-		socket.on('create-team', createTeam);
-		socket.on('assign-points', assignPoints);
-
 		async function disconnected() {
-      // TODO - Switch to IP based game info?
       console.log('disconnected', socket.id);
       byIPHash[hashedIP] -= 1;
 
@@ -226,9 +215,6 @@ module.exports = (server) => {
 
       clients = await io.allSockets();
       console.log('Connected clients:', clients.size);
-
-      // TODO - If all the clients leave, kill the game
-
     }
 
     // eslint-disable-next-line
@@ -262,13 +248,16 @@ module.exports = (server) => {
 			let winnerFound = false;
 			while (buzzerPressQueue.length > 0 && !winnerFound) {
 				let candidate = buzzerPressQueue.shift();
-				if (state.roundInfo.answeredTeams.indexOf(state.playerInfo[candidate].team) === -1) {
+				if (state.playerInfo[candidate].team !== undefined &&
+						state.roundInfo.answeredTeams.indexOf(state.playerInfo[candidate].team) === -1) {
 					// player won the buzzer press
 					state.roundInfo.answeringPlayer = candidate;
 					state.roundInfo.answeringTeam = state.playerInfo[candidate].team;
 					state.roundInfo.answeredTeams.push(state.playerInfo[candidate].team);
 					winnerFound = true;
 					console.log(`${candidate} on ${state.roundInfo.answeringTeam} hit the buzzer first`);
+				} else if (state.playerInfo[candidate].team === undefined) {
+					console.log(`${candidate} is not on a team`);
 				} else {
 					console.log(`${candidate}s team already answered this round`);
 				}
